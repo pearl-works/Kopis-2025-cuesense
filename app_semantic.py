@@ -741,15 +741,16 @@ def run_app():
     border-bottom: 1px dotted #94a3b8;
     }
 
-    /* 말풍선 본체 */
+    /* 말풍선 본체: 아이콘의 '오른쪽 가장자리'에 붙이고, 왼쪽으로 펼쳐지게 */
     .tooltip::after {
     content: attr(data-tooltip);
     position: absolute;
-    left: 50%;
-    bottom: calc(100% + 10px);   /* 요소 위로 10px 띄우기 */
-    transform: translateX(-50%);
+    right: 0;                        /* ← 화면 밖으로 넘치지 않게 오른쪽을 anchor */
+    left: auto;
+    bottom: calc(100% + 10px);
+    transform: none;                 /* 가운데 정렬 해제 */
 
-    display: block;               /* ← 인라인 말고 블록으로 */
+    display: block;
     background: #111827;
     color: #fff;
     text-align: left;
@@ -759,12 +760,12 @@ def run_app():
     border-radius: 8px;
     box-shadow: 0 8px 20px rgba(0,0,0,.15);
 
-    /* 줄바꿈 안정화 (한글/긴 단어 대응) */
-    white-space: pre-line;        /* \n 처리 */
-    overflow-wrap: anywhere;      /* 어디서든 줄바꿈 허용 */
-    word-break: break-word;       /* fallback */
-    width: max-content;           /* 내용만큼 폭 */
-    max-width: 320px;             /* 최대 폭 제한 */
+    /* 줄바꿈 & 폭 제한: 모바일에서도 안전 */
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    width: max-content;
+    max-width: min(320px, calc(100vw - 32px));  /* 화면 좌우 16px 여백 보장 */
 
     opacity: 0;
     pointer-events: none;
@@ -772,13 +773,14 @@ def run_app():
     z-index: 10000;
     }
 
-    /* 꼬리 */
+    /* 꼬리: 오른쪽 끝에서 살짝 안쪽으로 */
     .tooltip::before {
     content: "";
     position: absolute;
-    left: 50%;
+    right: 8px;                      /* ← 꼬리 위치도 오른쪽 기준 */
+    left: auto;
     bottom: calc(100% + 4px);
-    transform: translateX(-50%);
+    transform: none;
     border-width: 6px;
     border-style: solid;
     border-color: #111827 transparent transparent transparent;
@@ -792,6 +794,16 @@ def run_app():
     .tooltip:hover::after,
     .tooltip:hover::before {
     opacity: 1;
+    }
+
+    /* 아주 작은 화면에서는 중앙 위쪽으로 띄우기(선택 사항) */
+    @media (max-width: 420px) {
+    .tooltip::after {
+        left: 50%; right: auto; transform: translateX(-50%);
+    }
+    .tooltip::before {
+        left: 50%; right: auto; transform: translateX(-50%);
+    }
     }
     </style>
     """, unsafe_allow_html=True)
