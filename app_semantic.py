@@ -33,9 +33,6 @@ from openai import OpenAI
 # --------------------------
 load_dotenv()
 
-# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-# PROJECT_ID = os.getenv("PROJECT_ID")
-# SERVICE_ACCOUNT_FILE = os.getenv("SERVICE_ACCOUNT_FILE")
 
 #Secrets 읽기
 OPENAI_API_KEY = st.secrets.get("OPENAI_API_KEY", "").strip()
@@ -49,15 +46,6 @@ if not PROJECT_ID:
 
 openai_client = OpenAI(api_key=OPENAI_API_KEY)
 
-# def get_bq_client(project_id: Optional[str] = None,
-#                   service_account_file: Optional[str] = None) -> bigquery.Client:
-#     if service_account_file:
-#         creds = service_account.Credentials.from_service_account_file(service_account_file)
-#         return bigquery.Client(project=project_id or creds.project_id, credentials=creds)
-#     return bigquery.Client(project=project_id)
-
-# bq_client = get_bq_client(PROJECT_ID, SERVICE_ACCOUNT_FILE)
-
 def get_bq_client(project_id: str, sa_info: dict) -> bigquery.Client:
     if not sa_info:
         st.error("gcp_service_account가 Secrets에 없습니다.")
@@ -70,10 +58,8 @@ bq_client = get_bq_client(PROJECT_ID, GCP_SA_INFO)
 KST = pytz.timezone("Asia/Seoul")
 TODAY = dt.datetime.now(KST)
 
-# st.set_page_config(page_title="CueSence 큐센스", page_icon="🎭", layout="wide")
 with open("assets/cuesence_favicon.png", "rb") as f:
     st.set_page_config(page_title="CueSence 큐센스", page_icon=f.read(), layout="wide")
-
 
 # --------------------------
 # 공통 유틸
@@ -401,12 +387,8 @@ def load_show_candidates(day_setting) -> pd.DataFrame:
             """
         )
 
-    # sql = ('''SELECT *
-    #       FROM pg_snapshot.temp_df_show3
-    #       ORDER BY 1''')
-
     df = fn_query(sql)
-    # datetime 표준화(KST 표시용)
+
     if "datetime" in df.columns:
         df["datetime"] = pd.to_datetime(df["datetime"], utc=True, errors="coerce").dt.tz_convert("Asia/Seoul")
     # 결측 보정
@@ -714,8 +696,6 @@ def render_card(item: Dict[str, Any], rank: int):
     )
 
 
-
-
 # --------------------------
 # 7) 메인 앱
 # --------------------------
@@ -728,7 +708,7 @@ def run_app():
         return base64.b64encode(p.read_bytes()).decode("utf-8") if p.exists() else ""
 
     if "chat" not in st.session_state:
-        st.session_state["chat"] = []  # [{"role":"user"|"assistant","content":str,"cards":list|None}]
+        st.session_state["chat"] = []  
 
     # ---------------------------
     # Global CSS (one place)
@@ -1093,12 +1073,9 @@ def run_app():
                                     )
                         except Exception as e:
                             append_chat("assistant", f"오류가 발생했어요: {e}")
-
-            # (D) 히스토리에 저장이 끝났으니, 새 히스토리로 화면 전체 재그리기
             st.rerun()
 
         # --- 4) 빈 상태 박스 ---
-        # chat이 비어 있을 때만 보여줌 (유저 입력 후에는 위에서 append되어 즉시 사라짐)
         if not st.session_state["chat"]:
             st.markdown(
                 """
