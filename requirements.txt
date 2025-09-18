@@ -1,0 +1,18 @@
+# === Core ===
+streamlit>=1.36
+pandas>=2.0
+numpy>=1.24
+pytz>=2023.3
+rank-bm25>=0.2.2
+
+# === BigQuery + pandas integration ===
+google-cloud-bigquery>=3.11
+db-dtypes>=1.2.0
+pyarrow>=14.0.0
+
+# === LLM (optional for recommendation explanations) ===
+openai>=1.40
+
+# === Optional: load .env during local dev ===
+python-dotenv>=1.0.1
+
