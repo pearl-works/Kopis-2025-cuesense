@@ -576,7 +576,7 @@ def inject_serendipity_slot(
             "score": float(score_map.get(picked_code, 0.0)),
             "title": pick.iloc[0].get("title", ""),
             "genre": pick.iloc[0].get("genre", ""),
-            "facility_name": r.get("facility_name",""),
+            "facility_name": pick.iloc[0].get("facility_name",""),
             "venue": pick.iloc[0].get("venue", ""),
             "city":  pick.iloc[0].get("city", ""),
             "datetime": pick.iloc[0].get("datetime", ""),
@@ -677,7 +677,6 @@ def render_card(item: Dict[str, Any], rank: int):
         "(키워드가 겹치는지, 문장의 뜻이 닮았는지도 함께 살펴봐요.)\">"
         "ⓘ help</span></div>"
     )
-
 
     # 안전 이스케이프
     title_html   = html_escape(str(item.get("title","")))
