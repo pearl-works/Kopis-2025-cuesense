@@ -20,6 +20,7 @@ import numpy as np
 import pytz
 import streamlit as st
 from dotenv import load_dotenv
+from html import escape as html_escape
 
 from google.cloud import bigquery
 from google.oauth2 import service_account
@@ -378,8 +379,7 @@ def load_show_candidates(day_setting) -> pd.DataFrame:
                 COALESCE(b.seats_for_sale, 0) AS seats_total,
                 GREATEST(0, COALESCE(b.seats_for_sale,0) - COALESCE(s.net_sold,0)) AS seats_left,
                 acs.accessible_seat_count as accessible_seat_count,
-<<<<<<< HEAD
-                # url.sales_page_url as sales_page_url,
+                url.sales_page_url as sales_page_url,
                 openai.opnai_output
                 FROM base b
                     LEFT JOIN popularity_scaled ps 
@@ -395,15 +395,6 @@ def load_show_candidates(day_setting) -> pd.DataFrame:
                          ON b.performance_code = url.performance_code
                          AND b.performance_ts  = PARSE_TIMESTAMP('%Y-%m-%d %H:%M', url.performance_ts, 'Asia/Seoul')
                     ORDER BY b.performance_ts
-=======
-                openai.opnai_output
-                FROM base b
-                LEFT JOIN popularity_scaled ps USING (performance_code)
-                LEFT JOIN sold_until_now s USING (performance_code, performance_ts)
-                INNER JOIN pg_snapshot.dm_openai_output openai USING (performance_code)
-                LEFT JOIN  pg_snapshot.dm_accessible_seat acs USING (venue_code)
-                ORDER BY b.performance_ts
->>>>>>> parent of d4ce6ad (Update app_semantic.py)
             """
         )
 
