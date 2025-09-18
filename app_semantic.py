@@ -275,6 +275,7 @@ def load_show_candidates(day_setting) -> pd.DataFrame:
             SELECT
                 CAST(performance_code AS STRING)                   AS performance_code,
                 CAST(performance_name AS STRING)                   AS performance_name,
+                CAST(facility_name AS STRING)                      AS facility_name,
                 CAST(venue_code AS STRING)                         AS venue_code,
                 CAST(venue_name AS STRING)                         AS venue_name,
                 CAST(region_name AS STRING)                        AS region_name,
@@ -296,6 +297,7 @@ def load_show_candidates(day_setting) -> pd.DataFrame:
             SELECT
                 performance_code,
                 ANY_VALUE(performance_name)           AS performance_name,
+                ANY_VALUE(facility_name)              AS facility_name,
                 ANY_VALUE(venue_code)                 AS venue_code,
                 ANY_VALUE(venue_name)                 AS venue_name,
                 ANY_VALUE(region_name)                AS region_name,
@@ -367,6 +369,7 @@ def load_show_candidates(day_setting) -> pd.DataFrame:
                 b.performance_name  AS title,
                 b.genre_name        AS genre,
                 b.subgenre_name     AS subgenre,
+                b.facility_name     AS facility_name,
                 b.venue_name        AS venue,
                 b.region_name       AS city,
                 b.address           AS address,
@@ -398,9 +401,9 @@ def load_show_candidates(day_setting) -> pd.DataFrame:
             """
         )
 
-    sql = ('''SELECT *
-          FROM pg_snapshot.temp_df_show3
-          ORDER BY 1''')
+    # sql = ('''SELECT *
+    #       FROM pg_snapshot.temp_df_show3
+    #       ORDER BY 1''')
 
     df = fn_query(sql)
     # datetime 표준화(KST 표시용)
@@ -513,6 +516,7 @@ def semantic_match(query: str, df_filt: pd.DataFrame, n_bm25: int, top_k: int, u
             "score": float(sims[i]),
             "title": r.get("title",""),
             "genre": r.get("genre",""),
+            "facility_name": r.get("facility_name",""),
             "venue": r.get("venue",""),
             "city": r.get("city",""),
             "datetime": r.get("datetime",""),
@@ -572,7 +576,7 @@ def inject_serendipity_slot(
             "score": float(score_map.get(picked_code, 0.0)),
             "title": pick.iloc[0].get("title", ""),
             "genre": pick.iloc[0].get("genre", ""),
-            # "venue": pick.iloc[0].get("venue", ""),
+            "facility_name": r.get("facility_name",""),
             "venue": pick.iloc[0].get("venue", ""),
             "city":  pick.iloc[0].get("city", ""),
             "datetime": pick.iloc[0].get("datetime", ""),
@@ -678,7 +682,7 @@ def render_card(item: Dict[str, Any], rank: int):
     # 안전 이스케이프
     title_html   = html_escape(str(item.get("title","")))
     genre_html   = html_escape(str(item.get("genre","")))
-    venue_html   = html_escape(str(item.get("venue","")))
+    venue_html   = html_escape(str(item.get("facility_name","")))
     city_html    = html_escape(str(item.get("city","")))
     dt_html      = html_escape(dt_str)
     summary_html = html_escape(summary) if summary else "이 공연이 딱 적합해 보입니다!!"
