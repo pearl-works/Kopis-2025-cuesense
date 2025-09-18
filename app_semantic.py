@@ -732,78 +732,95 @@ def run_app():
     # ---------------------------
     st.markdown("""
     <style>
-    /* --- Tooltip (semantic score help) --- */
+    /* ==== Sidebar bottom caption (sticky) ==== */
+    [data-testid="stSidebar"] > div:first-child,
+    section[data-testid="stSidebar"] > div {
+        height: 100vh; display: flex; flex-direction: column;
+    }
+    .sidebar-bottom { margin-top: auto; padding: 10px 8px 16px;
+                        color: rgba(49,51,63,.6); font-size: 0.8rem; }
+    .sidebar-bottom hr { margin: 6px 0 8px; }
+
+    /* ==== Hero (복구/고정) ==== */
+    .hero {
+        background: linear-gradient(135deg, #fbf4f6 0%, #f4f1fb 60%, #f1eefb 100%) !important;
+        border: 1px solid rgba(0,0,0,.05) !important;
+        border-radius: 18px !important;
+        padding: 18px 22px !important;
+        display: flex !important; align-items: center !important; justify-content: space-between !important; gap: 18px !important;
+        box-shadow: 0 6px 18px rgba(0,0,0,.06) !important;
+    }
+    .hero-left { display:flex !important; align-items:center !important; gap:14px !important; }
+    .hero-logo  { height: 64px !important; object-fit: contain !important; filter: drop-shadow(0 2px 6px rgba(0,0,0,.06)) !important; }
+    .hero-tagline { margin: 0 !important; color:#333 !important; opacity:.9 !important; font-size:.95rem !important; }
+    .pills { white-space:nowrap !important; }
+    .pill {
+        display:inline-block !important; padding:6px 12px !important; border-radius:999px !important;
+        background: rgba(255,255,255,.75) !important; border:1px solid rgba(0,0,0,.06) !important;
+        font-size:.85rem !important; color:#333 !important; margin-left:8px !important; backdrop-filter: blur(4px) !important;
+    }
+    @media (max-width: 900px) {
+        .hero { flex-direction: column !important; align-items: flex-start !important; }
+        .pills { margin-top: 8px !important; }
+    }
+
+    /* ==== Empty-state card (복구/고정) ==== */
+    .emptystate {
+        border: 1px dashed rgba(0,0,0,.15) !important;
+        border-radius: 12px !important;
+        padding: 24px 28px !important;
+        margin: 14px 0 6px !important;
+        text-align: center !important;
+        background: #fafafa !important;
+        color: rgba(60,60,67,.9) !important;
+        font-size: 0.95rem !important; line-height: 1.55 !important;
+    }
+    .emptystate h4 { margin: 0 0 10px 0 !important; font-weight: 700 !important; color:#2f2f2f !important; }
+    .emptystate ul { list-style: none !important; padding-left: 0 !important; text-align: left !important; display: inline-block !important; margin:12px 0 0 !important; }
+    .emptystate li::before { content: "💡 " !important; }
+
+    /* ==== Recommendation grid ==== */
+    .grid { display:grid !important; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)) !important; gap:14px !important; }
+
+    /* ==== Tooltip (semantic score help) - 페이지 밖 넘침 방지 포함 ==== */
     .tooltip {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    cursor: help;
-    border-bottom: 1px dotted #94a3b8;
+        position: relative !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        cursor: help !important;
+        border-bottom: 1px dotted #94a3b8 !important;
     }
-
-    /* 말풍선 본체: 아이콘의 '오른쪽 가장자리'에 붙이고, 왼쪽으로 펼쳐지게 */
     .tooltip::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    right: 0;                        /* ← 화면 밖으로 넘치지 않게 오른쪽을 anchor */
-    left: auto;
-    bottom: calc(100% + 10px);
-    transform: none;                 /* 가운데 정렬 해제 */
+        content: attr(data-tooltip) !important;
+        position: absolute !important;
+        right: 0 !important; left: auto !important;
+        bottom: calc(100% + 10px) !important;
+        transform: none !important;
 
-    display: block;
-    background: #111827;
-    color: #fff;
-    text-align: left;
-    font-size: 12px;
-    line-height: 1.5;
-    padding: 8px 10px;
-    border-radius: 8px;
-    box-shadow: 0 8px 20px rgba(0,0,0,.15);
+        display: block !important;
+        background: #111827 !important; color: #fff !important; text-align: left !important;
+        font-size: 12px !important; line-height: 1.5 !important;
+        padding: 8px 10px !important; border-radius: 8px !important;
+        box-shadow: 0 8px 20px rgba(0,0,0,.15) !important;
 
-    /* 줄바꿈 & 폭 제한: 모바일에서도 안전 */
-    white-space: pre-line;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    width: max-content;
-    max-width: min(320px, calc(100vw - 32px));  /* 화면 좌우 16px 여백 보장 */
+        white-space: pre-line !important; overflow-wrap: anywhere !important; word-break: break-word !important;
+        width: max-content !important; max-width: min(320px, calc(100vw - 32px)) !important;
 
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .15s ease;
-    z-index: 10000;
-    }
-
-    /* 꼬리: 오른쪽 끝에서 살짝 안쪽으로 */
-    .tooltip::before {
-    content: "";
-    position: absolute;
-    right: 8px;                      /* ← 꼬리 위치도 오른쪽 기준 */
-    left: auto;
-    bottom: calc(100% + 4px);
-    transform: none;
-    border-width: 6px;
-    border-style: solid;
-    border-color: #111827 transparent transparent transparent;
-
-    opacity: 0;
-    transition: opacity .15s ease;
-    z-index: 10000;
-    }
-
-    /* hover 시 보이기 */
-    .tooltip:hover::after,
-    .tooltip:hover::before {
-    opacity: 1;
-    }
-
-    /* 아주 작은 화면에서는 중앙 위쪽으로 띄우기(선택 사항) */
-    @media (max-width: 420px) {
-    .tooltip::after {
-        left: 50%; right: auto; transform: translateX(-50%);
+        opacity: 0 !important; pointer-events: none !important; transition: opacity .15s ease !important;
+        z-index: 10000 !important;
     }
     .tooltip::before {
-        left: 50%; right: auto; transform: translateX(-50%);
+        content: "" !important;
+        position: absolute !important;
+        right: 8px !important; left: auto !important;
+        bottom: calc(100% + 4px) !important;
+        border-width: 6px !important; border-style: solid !important; border-color: #111827 transparent transparent transparent !important;
+        opacity: 0 !important; transition: opacity .15s ease !important; z-index: 10000 !important;
     }
+    .tooltip:hover::after, .tooltip:hover::before { opacity: 1 !important; }
+    @media (max-width: 420px){
+        .tooltip::after { left:50% !important; right:auto !important; transform: translateX(-50%) !important; }
+        .tooltip::before { left:50% !important; right:auto !important; transform: translateX(-50%) !important; }
     }
     </style>
     """, unsafe_allow_html=True)
