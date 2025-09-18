@@ -732,98 +732,66 @@ def run_app():
     # ---------------------------
     st.markdown("""
     <style>
-    /* ==== Sidebar bottom caption (sticky) ==== */
-    [data-testid="stSidebar"] > div:first-child,
-    section[data-testid="stSidebar"] > div {
-        height: 100vh; display: flex; flex-direction: column;
-    }
-    .sidebar-bottom { margin-top: auto; padding: 10px 8px 16px;
-                        color: rgba(49,51,63,.6); font-size: 0.8rem; }
-    .sidebar-bottom hr { margin: 6px 0 8px; }
-
-    /* ==== Hero ==== */
-    .hero {
-        background: linear-gradient(135deg, #fbf4f6 0%, #f4f1fb 60%, #f1eefb 100%);
-        border: 1px solid rgba(0,0,0,.05);
-        border-radius: 18px;
-        padding: 18px 22px;
-        display: flex; align-items: center; justify-content: space-between; gap: 18px;
-        box-shadow: 0 6px 18px rgba(0,0,0,.06);
-    }
-    .hero-left { display:flex; align-items:center; gap:14px; }
-    .hero-logo  { height: 64px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,.06)); }
-    .hero-tagline { margin: 0; color:#333; opacity:.9; font-size:.95rem; }
-    .pills { white-space:nowrap; }
-    .pill {
-        display:inline-block; padding:6px 12px; border-radius:999px;
-        background: rgba(255,255,255,.75); border:1px solid rgba(0,0,0,.06);
-        font-size:.85rem; color:#333; margin-left:8px; backdrop-filter: blur(4px);
-    }
-    @media (max-width: 900px) { .hero { flex-direction: column; align-items: flex-start; }
-                                .pills { margin-top: 8px; } }
-
-    /* ==== Empty-state card ==== */
-    .emptystate {
-        border: 1px dashed rgba(0,0,0,.15);
-        border-radius: 12px;
-        padding: 24px 28px;
-        margin: 14px 0 6px;
-        text-align: center;
-        background: #fafafa;
-        color: rgba(60,60,67,.9);
-        font-size: 0.95rem; line-height: 1.55;
-    }
-    .emptystate h4 { margin: 0 0 10px 0; font-weight: 700; color:#2f2f2f; }
-    .emptystate ul { list-style: none; padding-left: 0; text-align: left; display: inline-block; margin:12px 0 0; }
-    .emptystate li::before { content: "💡 "; }
-
-    /* ==== Recommendation grid ==== */
-    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; }
-
-    /* ==== Tooltip (for semantic score help) ==== */
+    /* --- Tooltip (semantic score help) --- */
     .tooltip {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        cursor: help;
-        border-bottom: 1px dotted #94a3b8;
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+    border-bottom: 1px dotted #94a3b8;
     }
+
+    /* 말풍선 본체 */
     .tooltip::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: 150%;
-        background: #111827;
-        color: #fff;
-        font-size: 12px;
-        line-height: 1.45;
-        padding: 8px 10px;
-        border-radius: 8px;
-        box-shadow: 0 8px 20px rgba(0,0,0,.15);
-        white-space: pre-line;         /* \n 줄바꿈 표시 */
-        max-width: 320px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity .15s ease;
-        z-index: 10000;
+    content: attr(data-tooltip);
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 10px);   /* 요소 위로 10px 띄우기 */
+    transform: translateX(-50%);
+
+    display: block;               /* ← 인라인 말고 블록으로 */
+    background: #111827;
+    color: #fff;
+    text-align: left;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 8px 10px;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,.15);
+
+    /* 줄바꿈 안정화 (한글/긴 단어 대응) */
+    white-space: pre-line;        /* \n 처리 */
+    overflow-wrap: anywhere;      /* 어디서든 줄바꿈 허용 */
+    word-break: break-word;       /* fallback */
+    width: max-content;           /* 내용만큼 폭 */
+    max-width: 320px;             /* 최대 폭 제한 */
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .15s ease;
+    z-index: 10000;
     }
+
+    /* 꼬리 */
     .tooltip::before {
-        content: "";
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: 138%;
-        border-width: 6px;
-        border-style: solid;
-        border-color: #111827 transparent transparent transparent;
-        opacity: 0;
-        transition: opacity .15s ease;
-        z-index: 10000;
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 4px);
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: #111827 transparent transparent transparent;
+
+    opacity: 0;
+    transition: opacity .15s ease;
+    z-index: 10000;
     }
+
+    /* hover 시 보이기 */
     .tooltip:hover::after,
     .tooltip:hover::before {
-        opacity: 1;
+    opacity: 1;
     }
     </style>
     """, unsafe_allow_html=True)
